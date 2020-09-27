@@ -1,12 +1,23 @@
 from flask import Flask, render_template, redirect, request, url_for, session
+from flask_mysqldb import MySQL
+from database import create_tables, add_test_data
 
 app = Flask(__name__)
 app.secret_key = 'super secret key2'
 
+app.config['MYSQL_USER'] = 'sql7367520'
+app.config['MYSQL_PASSWORD'] = 'rsLdkWPtZm'
+app.config['MYSQL_HOST'] = 'sql7.freemysqlhosting.net'
+app.config['MYSQL_DB'] = 'sql7367520'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+mysql = MySQL(app)
+
 @app.route('/')
 def home():
     if session.get('logged_in'):
-        return render_template('index.html')
+        create_tables()
+        success = add_test_data()
+        return render_template('index.html', success=success)
     else:
         return redirect(url_for('login_page'))
 
