@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for, session
 from flask_mysqldb import MySQL
-from database import create_tables, add_test_data, read_all_data, add_user
+from database import create_tables, add_test_data, read_all_data, add_user, add_planet_data
 
 app = Flask(__name__)
 app.secret_key = 'super secret key2'
@@ -18,7 +18,9 @@ def home():
     if session.get('logged_in'):
         #create_tables()
         #add_test_data()
-        add_user("Alex van Winkel", "Alexicoo", "1234", 0)
+        #add_user("Alex van Winkel", "Alexicoo", "1234", 0)
+        #add_user("Peter de Wit", "pwit", "1234", 0)
+        #add_planet_data()
         records = read_all_data()
         return render_template('index.html', records=records)
     else:
