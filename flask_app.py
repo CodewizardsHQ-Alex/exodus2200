@@ -1,28 +1,30 @@
 from flask import Flask, render_template, redirect, request, url_for, session
-from flask_mysqldb import MySQL
-from database import create_tables, add_test_data, read_all_data, add_user, add_planet_data
+import MySQLdb
+from database import create_tables, add_test_data, read_user_data, read_planet_data, add_user, add_planet_data
 
 app = Flask(__name__)
 app.secret_key = 'super secret key2'
-app.config["DEBUG"] = True
 
-app.config['MYSQL_USER'] = 'Exodus2200'
-app.config['MYSQL_PASSWORD'] = 'Excalibur_01'
-app.config['MYSQL_HOST'] = 'Exodus2200.mysql.pythonanywhere-services.com'
-app.config['MYSQL_DB'] = 'Exodus2200$exodus2200'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-mysql = MySQL(app)
+mysql = MySQLdb.connect(host="Exodus2200.mysql.pythonanywhere-services.com", user="Exodus2200", passwd="Excalibur_01", db="Exodus2200$exodus2200")
+
 
 @app.route('/')
 def home():
     if session.get('logged_in'):
-        #create_tables()
-        #add_test_data()
-        #add_user("Alex van Winkel", "Alexicoo", "1234", 0)
-        #add_user("Peter de Wit", "pwit", "1234", 0)
-        #add_planet_data()
-        records = read_all_data()
-        return render_template('index.html', records=records)
+
+        cur = mysql.cursor()
+
+        #create_tables(cur)
+        #add_test_data(cur)
+        #add_user(cur, "Alex van Winkel", "Alexicoo", "1234", 0)
+        #add_user(cur, "Peter de Wit", "pwit", "1234", 0)
+        #add_planet_data(cur)
+        #cur.execute('''INSERT INTO Planets (planet_id, name, x_pos, y_pos, z_pos, url, message ) VALUES ( 1, "Mygross", -234, 877, 32, "Hx18Ah1u", "We have hhacked your system")''')
+        #mysql.commit()
+        users = read_user_data(cur)
+        planets = read_planet_data(cur)
+        cur.close()
+        return render_template('index.html', users=users, planets=planets)
     else:
         return redirect(url_for('login_page'))
 
@@ -35,26 +37,36 @@ def login_page():
         password = request.form['password']
         if username == "alex" and password == "csgo":
             session['logged_in'] = True
+            session['admin'] = True
             return redirect(url_for('home'))
         else:
             message="username or password unknown"
-    
-    
+
+
     return render_template("login.html", message=message)
 
 
-@app.route("/wof", methods=['GET', 'POST'])
-def wof():
-    name = str(request.form['name'])
-    '''
-    date = request.form['date']
-    time = request.form['time']
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    cur = mysql.cursor()
+    #add_user(cur, "Alex van Winkel", "Alexicoo", "1234", 0)
+    #add_user(cur, "Peter de Wit", "pwit", "1234", 0)
+    #add_planet_data(cur)
+    #cur.execute('''INSERT INTO Planets (planet_id, name, x_pos, y_pos, z_pos, url, message ) VALUES ( 1, "Mygross", -234, 877, 32, "Hx18Ah1u", "We have hhacked your system")''')
+    #mysql.commit()
+    return render_template('register.html', message=message)
 
-    output = name + "finished the Instructorgame on" + date + "with a time of" + time
-    print(output)
-    return output'''
-    print("route wof successfully called by", name)
-    return "Hello " + name
-
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+    if session.get('admin'):
+        #create_tables(cur)
+        #add_test_data(cur)
+        cur = mysql.cursor()
+        users = read_user_data(cur)
+        planets = read_planet_data(cur)
+        cur.close()
+        return render_template('admin.html', users=users, planets=planets)
+    else:
+        return redirect(url_for('login_page'))
 
 #test
