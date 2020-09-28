@@ -8,23 +8,21 @@ app.secret_key = 'super secret key2'
 mysql = MySQLdb.connect(host="Exodus2200.mysql.pythonanywhere-services.com", user="Exodus2200", passwd="Excalibur_01", db="Exodus2200$exodus2200")
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     if session.get('logged_in'):
+        message = ""
+        if request.method == "POST":
 
-        cur = mysql.cursor()
-
-        #create_tables(cur)
-        #add_test_data(cur)
-        #add_user(cur, "Alex van Winkel", "Alexicoo", "1234", 0)
-        #add_user(cur, "Peter de Wit", "pwit", "1234", 0)
-        #add_planet_data(cur)
-        #cur.execute('''INSERT INTO Planets (planet_id, name, x_pos, y_pos, z_pos, url, message ) VALUES ( 1, "Mygross", -234, 877, 32, "Hx18Ah1u", "We have hhacked your system")''')
-        #mysql.commit()
-        users = read_user_data(cur)
-        planets = read_planet_data(cur)
-        cur.close()
-        return render_template('index.html', users=users, planets=planets)
+            if request.form.get("L") == "logout":
+                session.clear()
+                return redirect(url_for('login_page'))
+            else:
+                message = "L = " + str(request.form.get("L"))
+            return render_template('index.html',  message=message)
+        else:
+            message = "All systems operational"
+            return render_template('index.html',  message=message)
     else:
         return redirect(url_for('login_page'))
 
