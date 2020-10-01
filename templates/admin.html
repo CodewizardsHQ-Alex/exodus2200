@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>USS - main</title>
+    <title>USS - admin</title>
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Droid+Sans+Mono" />
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
   </head>
@@ -23,6 +23,11 @@
       <p >{{p}}</p>
     {% endfor %}
 
+    <h3>Invitation codes</h3>
+
+    {% for i in invitation_codes %}
+    <p >{{i}}</p>
+    {% endfor %}
 
     <hr>
     <p>bottom</p>

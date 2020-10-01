@@ -35,21 +35,26 @@ def create_tables(cur):
     #s = cur.execute('''CREATE TABLE IF NOT EXISTS State (id INT, name VARCHAR(20))''')
 
     """
+    #cur.execute('''CREATE TABLE IF NOT EXISTS Invitation_codes(id INT, code VARCHAR(20), times_used INT)''')
+
     return
 
 def add_test_data(cur):
-    #s = cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Alex van Winkel", "alexicoo", "1234", 0)''')
-    s = cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Peter de Wit", "peter", "1234", 0)''')
-    s = cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Frank de Wit", "frank", "1234", 0)''')
+    #cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Alex van Winkel", "alexicoo", "1234", 0)''')
+    #cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Peter de Wit", "peter", "1234", 0)''')
+    #cur.execute('''INSERT INTO Invitation_codes (id, code, times_used) VALUES (0, "INIT001", 0)''')
+    mysql.commit()
     return
 
 def add_planet_data(cur):
     s = cur.execute('''INSERT INTO Planets (planet_id, name, x_pos, y_pos, z_pos, url, message ) VALUES ( 0, "Tygross", -234, 877, 32, "Hx78Ah1u", "We have hacked your system")''')
+    mysql.commit()
     return
 
 def add_user(cur, name, username, password, level):
     s = cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES (%s, %s, %s, %s)''', (name, username, password, level ))
-
+    mysql.commit()
+    return
 
 def read_user_data(cur):
     cur.execute('''SELECT * FROM Users''')
@@ -58,6 +63,11 @@ def read_user_data(cur):
 
 def read_planet_data(cur):
     cur.execute('''SELECT * FROM Planets''')
+    records = cur.fetchall()
+    return records
+
+def read_invitation_codes(cur):
+    cur.execute('''SELECT * FROM Invitation_codes''')
     records = cur.fetchall()
     return records
 

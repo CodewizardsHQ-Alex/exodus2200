@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, request, url_for, session
 import MySQLdb
 from database import create_tables, add_test_data, read_user_data, read_planet_data, add_user, add_planet_data
-
+from database import read_invitation_codes
 app = Flask(__name__)
 app.secret_key = 'super secret key2'
 
@@ -46,25 +46,54 @@ def login_page():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    cur = mysql.cursor()
-    #add_user(cur, "Alex van Winkel", "Alexicoo", "1234", 0)
-    #add_user(cur, "Peter de Wit", "pwit", "1234", 0)
-    #add_planet_data(cur)
-    #cur.execute('''INSERT INTO Planets (planet_id, name, x_pos, y_pos, z_pos, url, message ) VALUES ( 1, "Mygross", -234, 877, 32, "Hx18Ah1u", "We have hhacked your system")''')
-    #mysql.commit()
+    print(0)
+    message = ""
+    if request.method == 'POST':
+        
+        cur = mysql.cursor()
+        valid_inv_codes = []
+        data = read_invitation_codes(cur)
+        cur.close()
+        
+        for d in data:
+            valid_inv_codes.append(d[1])
+        print("Invitation codes :", valid_inv_codes)
+        print("Data :", data)
+        print(3)
+        inv_code = request.form['invitation_code']
+        print(4)
+        username = request.form['username']
+        print(5)
+        pssw1 = request.form['password1']
+        print(6)
+        pssw2 = request.form['password2']
+        
+        if pssw1 != pssw2:
+            
+            message = "passwords don't match"
+        else:
+            
+            message = "All good : " + str(inv_code) + " ; " + str(username)
+            
+        return render_template('register.html', message=message)
+    print(7)
     return render_template('register.html', message=message)
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
     if session.get('admin'):
-        #create_tables(cur)
-        #add_test_data(cur)
         cur = mysql.cursor()
+        #create_tables(cur)
+        add_test_data(cur)
         users = read_user_data(cur)
         planets = read_planet_data(cur)
+        invitation_codes = read_invitation_codes(cur)
+        mysql.commit()
         cur.close()
-        return render_template('admin.html', users=users, planets=planets)
+        return render_template('admin.html', 
+                                users=users, 
+                                planets=planets,
+                                invitation_codes=invitation_codes)
     else:
         return redirect(url_for('login_page'))
 
-#test
