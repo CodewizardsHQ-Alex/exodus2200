@@ -9,18 +9,21 @@ def create_tables(cur):
     
     #s = cur.execute('''CREATE TABLE IF NOT EXISTS TEST (id INT, name VARCHAR(20))''')
     #s = cur.execute('''DROP TABLE Users''')
-
-    """
-    #s = cur.execute('''CREATE TABLE IF NOT EXISTS Users (   user_id INT NOT NULL AUTO_INCREMENT, 
+    print("----------------------------------------------------")
+    
+    s = cur.execute('''CREATE TABLE IF NOT EXISTS Users (   user_id INT NOT NULL AUTO_INCREMENT, 
                                                             name VARCHAR(255),
                                                             username VARCHAR(32),
                                                             password VARCHAR(32),
                                                             date_joined TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                            invitation_code VARCHAR(32),
                                                             level INT NOT NULL DEFAULT 0,
                                                             state VARCHAR(32) DEFAULT 'clear',
                                                             last_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                                             PRIMARY KEY (user_id) 
                                                             )''')
+
+    """                                                            
     #s = cur.execute('''CREATE TABLE IF NOT EXISTS Planets ( planet_id INT NOT NULL, 
                                                             name VARCHAR(50),
                                                             x_pos INT,
@@ -40,8 +43,9 @@ def create_tables(cur):
     return
 
 def add_test_data(cur):
-    #cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Alex van Winkel", "alexicoo", "1234", 0)''')
-    #cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES ("Peter de Wit", "peter", "1234", 0)''')
+    cur.execute('''TRUNCATE TABLE Users''')
+    cur.execute('''INSERT INTO Users (name, username, password, invitation_code, level ) VALUES ("Alex van Winkel", "alexicoo", "1234", "TEST-001", 0)''')
+    cur.execute('''INSERT INTO Users (name, username, password, invitation_code, level ) VALUES ("Peter de Wit", "peter", "1234", "TEST-001", 0)''')
     #cur.execute('''INSERT INTO Invitation_codes (id, code, times_used) VALUES (0, "INIT001", 0)''')
     mysql.commit()
     return
@@ -51,8 +55,8 @@ def add_planet_data(cur):
     mysql.commit()
     return
 
-def add_user(cur, name, username, password, level):
-    s = cur.execute('''INSERT INTO Users (name, username, password, level ) VALUES (%s, %s, %s, %s)''', (name, username, password, level ))
+def add_user(cur, name, username, password, invitation_code, level):
+    s = cur.execute('''INSERT INTO Users (name, username, password, invitation_code, level ) VALUES (%s, %s, %s, %s, %s)''', (name, username, password, invitation_code, level ))
     mysql.commit()
     return
 

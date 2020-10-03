@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, request, url_for, session
 import MySQLdb
 from database import create_tables, add_test_data, read_user_data, read_planet_data, add_user, add_planet_data
 from database import read_invitation_codes
+from helper import hash_password, verify_password
+
 app = Flask(__name__)
 app.secret_key = 'super secret key2'
 
@@ -10,7 +12,7 @@ mysql = MySQLdb.connect(host="Exodus2200.mysql.pythonanywhere-services.com", use
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    print("-2")
+
     if session.get('logged_in'):
         message = ""
         if request.method == "POST":
@@ -35,8 +37,6 @@ def login_page():
             return redirect(url_for('register'))
         else:
             message = "R is : " + str(request.form.get("R"))
-        print("2")
-
 
         username = request.form['username']
         password = request.form['password']
@@ -53,37 +53,43 @@ def login_page():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    print(0)
     message = ""
     if request.method == 'POST':
         
         cur = mysql.cursor()
         valid_inv_codes = []
-        data = read_invitation_codes(cur)
-        cur.close()
+        stored_usernames = []
+        data1 = read_invitation_codes(cur)
+        data2 = read_user_data(cur)
         
-        for d in data:
+        for d in data1:
             valid_inv_codes.append(d[1])
-        print("Invitation codes :", valid_inv_codes)
-        print("Data :", data)
-        print(3)
-        inv_code = request.form['invitation_code']
-        print(4)
+
+        for d in data2:
+            stored_usernames.append(d[2])
+
+        name = request.form['name']
         username = request.form['username']
-        print(5)
         pssw1 = request.form['password1']
-        print(6)
         pssw2 = request.form['password2']
-        
+        inv_code = request.form['invitation_code']
+        level = 0
+
         if pssw1 != pssw2:
             
             message = "passwords don't match"
+        elif inv_code not in valid_inv_codes:
+            message = "wrong invitation code"
+        elif username in stored_usernames:
+            message = "username already exists"
         else:
-            
-            message = "All good : " + str(inv_code) + " ; " + str(username)
-            
+            message = "You have been registered with username: " + str(username)
+            password = hash_password(pssw1)
+            add_user(cur, name, username, password, inv_code, level)
+            cur.close()
+            return render_template("message.html", message=message, goto="/login")
+        cur.close()
         return render_template('register.html', message=message)
-    print(7)
     return render_template('register.html', message=message)
 
 @app.route("/admin", methods=['GET', 'POST'])
@@ -91,7 +97,7 @@ def admin():
     if session.get('admin'):
         cur = mysql.cursor()
         #create_tables(cur)
-        add_test_data(cur)
+        #add_test_data(cur)
         users = read_user_data(cur)
         planets = read_planet_data(cur)
         invitation_codes = read_invitation_codes(cur)
