@@ -10,6 +10,7 @@ mysql = MySQLdb.connect(host="Exodus2200.mysql.pythonanywhere-services.com", use
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    print("-2")
     if session.get('logged_in'):
         message = ""
         if request.method == "POST":
@@ -17,8 +18,8 @@ def home():
             if request.form.get("L") == "logout":
                 session.clear()
                 return redirect(url_for('login_page'))
-            else:
-                message = "L = " + str(request.form.get("L"))
+
+
             return render_template('index.html',  message=message)
         else:
             message = "All systems operational"
@@ -30,6 +31,12 @@ def home():
 def login_page():
     message = ""
     if request.method == 'POST':
+        if request.form.get("R") == "register":
+            return redirect(url_for('register'))
+        else:
+            message = "R is : " + str(request.form.get("R"))
+        print("2")
+
 
         username = request.form['username']
         password = request.form['password']

@@ -10,7 +10,7 @@
         <div class="top">
             <div class="top-bar">
               <form method="POST" action="">
-                <button class="top-btn" id="l-btn" type="submit" name="L" value="logout">L</button>
+                <button class="top-btn" type="submit" name="L" value="logout">L</button>
                 <button class="top-btn">[..]</button>
                 <button class="top-btn">{..}</button>
                 <button class="top-btn">A</button>
@@ -44,23 +44,6 @@
     </div>
 
   </body>
-  <script>
-    $(document).ready(function(){
 
-      $('#l-btn').click(function(){
-        console.log("L is pushed");
-        var cookies = document.cookie.split(";");
-
-        for (var i = 0; i < cookies.length; i++) {
-          var cookie = cookies[i];
-          var eqPos = cookie.indexOf("=");
-          var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        }
-      });
-
-    });
-   
-  </script>
 
 </html>
